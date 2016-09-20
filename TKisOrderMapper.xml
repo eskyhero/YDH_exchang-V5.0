@@ -120,7 +120,7 @@
 			101,
 			'1',
 			isnull((Select FItemID FROM dbo.t_Item where FNumber=#customer.code#),'000'),
-			'',
+			'收货人：'+#contact#+',联系电话：'+#mobile#+',收货地址：'+#area#+#address#,
 			Null,
 			0,
 			6863,
