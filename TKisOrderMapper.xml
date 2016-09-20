@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+        "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="KisSaleBill">
+    <typeAlias alias="Order" type="com.ircloud.ydh.sdk4j.model.Order"/>
+    <typeAlias alias="OrderDetail" type="com.ircloud.ydh.sdk4j.model.OrderDetail"/>
+
+   <sql id="Base_Columns">
+    FInterID, 
+	FBillNo, 
+	FBrNo, 
+	FTranType, 
+	FCancellation, 
+	FStatus, 
+	FDiscountType, 
+	Fdate, 
+	FSaleStyle, 
+	FFetchStyle, 
+	FCurrencyID, 
+	FCustID, 
+	FFetchAdd, 
+	FCheckDate, 
+	FMangerID, 
+	FDeptID, 
+	FEmpID, 
+	FBillerID, 
+	FSettleID, 
+	FExchangeRate, 
+	FMultiCheckDate1, 
+	FMultiCheckDate2, 
+	FMultiCheckDate3, 
+	FMultiCheckDate4, 
+	FMultiCheckDate5, 
+	FMultiCheckDate6, 
+	FPOOrdBillNo, 
+	FRelateBrID, 
+	FTransitAheadTime, 
+	FImport, 
+	FSelTranType, 
+	FBrID, 
+	FSettleDate, 
+	FExplanation, 
+	FAreaPS, 
+	FManageType, 
+	FSysStatus, 
+	FValidaterName, 
+	FConsignee, 
+	FVersionNo, 
+	FChangeDate, 
+	FChangeUser, 
+	FChangeCauses, 
+	FChangeMark, 
+	FPrintCount
+  </sql>
+  
+  <sql id="Detail_Base_Columns">
+    FInterID, 
+	FEntryID, 
+	FBrNo, 
+	FMapNumber, 
+	FMapName, 
+	FItemID, 
+	FAuxPropID, 
+	FQty, 
+	FUnitID, 
+	Fauxqty, 
+	FSecCoefficient, 
+	FSecQty, 
+	Fauxprice, 
+	FAuxTaxPrice, 
+	Famount, 
+	FCess, 
+	FTaxRate, 
+	FUniDiscount, 
+	FTaxAmount, 
+	FAuxPriceDiscount, 
+	FTaxAmt, 
+	FAllAmount, 
+	FTranLeadTime, 
+	FInForecast, 
+	FDate, 
+	Fnote, 
+	FPlanMode, 
+	FMTONo,
+	FBomInterID, 
+	FCostObjectID, 
+	FAdviceConsignDate, 
+	FATPDeduct, 
+	FLockFlag, 
+	FSourceBillNo, 
+	FSourceTranType, 
+	FSourceInterId, 
+	FSourceEntryID, 
+	FContractBillNo, 
+	FContractInterID, 
+	FContractEntryID, 
+	FSecCommitInstall, 
+	FCommitInstall, 
+	FAuxCommitInstall, 
+	FAllStdAmount, 
+	FMrpLockFlag, 
+	FHaveMrp, 
+	FReceiveAmountFor_Commit, 
+	FOrderBillNo, 
+	FOrderEntryID     	
+  </sql>
+
+    <insert id="saveOrder" parameterClass="Order">
+       insert into SEOrder(<include refid="Base_Columns"/>)
+       values(
+				(select MAX(FInterID)+1 from SEOrder),
+			#orderNum#,
+			'0',
+			81,
+			0,
+			0,
+			0,
+			(select CONVERT(char,#createTime#,23)),
+			308,
+			101,
+			'1',
+			isnull((Select FItemID FROM dbo.t_Item where FNumber=#customer.code#),'000'),
+			'',
+			Null,
+			0,
+			241,
+			251,
+			16497,
+			0,
+			1,
+			Null,
+			Null,
+			Null,
+			Null,
+			Null,
+			Null,
+			'',
+			0,
+			'0',
+			0,
+			0,
+			0,
+			(select CONVERT(char,#createTime#,23)),
+			'',
+			20302,
+			0,
+			0,
+			'',
+			0,
+			'000',
+			Null,
+			0,
+			'',
+			'',
+			0
+			)
+    </insert>
+    
+    <insert id="saveOrderDetail" parameterClass="OrderDetail">
+       insert into SEOrderEntry(<include refid="Detail_Base_Columns"/>)
+       values(
+				(select FInterID from  SEOrder where FBillNo = #orderNum#),
+				isnull((select MAX(FEntryID)+1 from SEOrderEntry where FInterID = (select FInterID from SEOrder where FInterID = #orderId#)), 1),
+				'0',
+				'',
+				'',
+				(select t.FItemID from (select t1.FItemID, t2.F_102 from t_ICItemCore t1 inner join t_ICItem t2 on t1.FItemID = t2.FItemID) t where t.F_102 = #productCode#),
+				0,
+				#count#,
+				239,
+				#count#,
+				0,
+				0,
+				#price#,
+				#price#,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				#money#,
+				'',
+				0,
+				NULL,
+				#productRemark#,
+				14036,
+				'',
+				0,
+				'0',
+				NULL,
+				0,
+				0,
+				'',
+				0,
+				0,
+				0,
+				'',
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				'',
+				''	
+			)
+    </insert>
+    
+        
+    <delete id="deleteOrder" parameterClass="Order">    
+        delete from SEOrder where FBillNo = #orderNum#
+    </delete>
+    
+    <update id="deleteReturnedOrders" parameterClass="java.util.List">
+      DELETE FROM SEOrder WHERE FBillNo in
+      <iterate conjunction="," open="(" close=")">
+         #list[].orderNum#
+      </iterate>
+    </update>   
+    
+    <update id="deleteReturnedOrderDetails" parameterClass="java.util.List">
+      DELETE FROM SEOrderEntry WHERE FInterID in (select FInterID from SEOrder where FBillNo in
+	      <iterate conjunction="," open="(" close=")">
+	         #list[].orderNum#	         
+	      </iterate>
+	  )
+    </update>
+    
+</sqlMap>
