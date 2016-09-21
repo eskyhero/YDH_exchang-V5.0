@@ -160,7 +160,7 @@
        insert into SEOrderEntry(<include refid="Detail_Base_Columns"/>)
        values(
 				(select FInterID from  SEOrder where FBillNo = #orderNum#),
-				isnull((select MAX(FEntryID)+1 from SEOrderEntry where FInterID = (select FInterID from SEOrder where FInterID = #orderId#)), 1),
+				isnull((select MAX(FEntryID)+1 from SEOrderEntry where FInterID = (select FInterID from SEOrder where FBillNo = #orderNum#)), 1),
 				'0',
 				'',
 				'',
